@@ -6,8 +6,6 @@ build/
 dist/
 .nbattrs
 nbproject/private/
-nbproject/project.properties
-nbproject/build-impl.xml
 .project
 .classpath
 .settings/
