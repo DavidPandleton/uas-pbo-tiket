@@ -1,0 +1,13 @@
+*.class
+*.jar
+*.log
+*.zip
+build/
+dist/
+.nbattrs
+nbproject/private/
+.project
+.classpath
+.settings/
+.DS_Store
+Thumbs.db
