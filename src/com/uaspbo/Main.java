@@ -1,8 +1,5 @@
 package com.uaspbo;
 
-import com.uaspbo.view.LoginPanel;
-import com.uaspbo.view.TiketPanel;
-import com.uaspbo.view.TransaksiPanel;
 import java.awt.CardLayout;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -24,9 +21,6 @@ public class Main extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        mainPanel.add(new TiketPanel(), "tiket");
-        mainPanel.add(new TransaksiPanel(this), "transaksi");
-
         add(mainPanel);
         setupMenuBar();
     }
@@ -35,17 +29,10 @@ public class Main extends JFrame {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menu = new JMenu("Menu");
-        JMenuItem tiketItem = new JMenuItem("Master Tiket");
-        JMenuItem transaksiItem = new JMenuItem("Transaksi");
         JMenuItem logoutItem = new JMenuItem("Logout");
 
-        tiketItem.addActionListener(e -> cardLayout.show(mainPanel, "tiket"));
-        transaksiItem.addActionListener(e -> cardLayout.show(mainPanel, "transaksi"));
         logoutItem.addActionListener(e -> logout());
 
-        menu.add(tiketItem);
-        menu.add(transaksiItem);
-        menu.addSeparator();
         menu.add(logoutItem);
         menuBar.add(menu);
         setJMenuBar(menuBar);
@@ -60,11 +47,7 @@ public class Main extends JFrame {
     }
 
     public static void main(String[] args) {
-        JFrame loginFrame = new JFrame("Login");
-        loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        loginFrame.setSize(400, 250);
-        loginFrame.setLocationRelativeTo(null);
-        loginFrame.add(new LoginPanel());
-        loginFrame.setVisible(true);
+        Main app = new Main();
+        app.setVisible(true);
     }
 }

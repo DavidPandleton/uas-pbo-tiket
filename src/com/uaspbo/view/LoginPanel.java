@@ -1,6 +1,5 @@
 package com.uaspbo.view;
 
-import com.uaspbo.Main;
 import com.uaspbo.dao.UserDAO;
 import com.uaspbo.model.User;
 import com.uaspbo.util.SessionManager;
@@ -84,9 +83,6 @@ public class LoginPanel extends JPanel {
                 SessionManager.setUser(user);
                 JOptionPane.showMessageDialog(this,
                         "Selamat datang, " + user.getUsername() + "!");
-                Main mainFrame = new Main();
-                mainFrame.setVisible(true);
-                this.setVisible(false);
             } else {
                 JOptionPane.showMessageDialog(this,
                         "Username atau password salah",
