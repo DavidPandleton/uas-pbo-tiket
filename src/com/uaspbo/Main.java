@@ -1,5 +1,6 @@
 package com.uaspbo;
 
+import com.uaspbo.view.TiketPanel;
 import com.uaspbo.view.TransaksiPanel;
 import java.awt.CardLayout;
 import javax.swing.JFrame;
@@ -22,6 +23,7 @@ public class Main extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
+        mainPanel.add(new TiketPanel(), "tiket");
         mainPanel.add(new TransaksiPanel(this), "transaksi");
 
         add(mainPanel);
@@ -32,12 +34,15 @@ public class Main extends JFrame {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menu = new JMenu("Menu");
+        JMenuItem tiketItem = new JMenuItem("Master Tiket");
         JMenuItem transaksiItem = new JMenuItem("Transaksi");
         JMenuItem logoutItem = new JMenuItem("Logout");
 
+        tiketItem.addActionListener(e -> cardLayout.show(mainPanel, "tiket"));
         transaksiItem.addActionListener(e -> cardLayout.show(mainPanel, "transaksi"));
         logoutItem.addActionListener(e -> logout());
 
+        menu.add(tiketItem);
         menu.add(transaksiItem);
         menu.addSeparator();
         menu.add(logoutItem);

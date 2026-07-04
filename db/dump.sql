@@ -24,3 +24,8 @@ CREATE TABLE transaksi (
 );
 
 INSERT INTO user (username, password) VALUES ('admin', 'admin123');
+
+INSERT INTO tiket (nama_tiket, harga, stok_tiket) VALUES
+('Konser Java', 150000, 20),
+('Tiket Bioskop', 50000, 50),
+('Seminar PBO', 75000, 10);
