@@ -29,6 +29,12 @@ public class TiketDAO {
         return list;
     }
 
+    // Alias sementara supaya kompatibel dengan TiketPanel.java
+    // (hapus method ini kalau Gusandra sudah menyamakan nama methodnya)
+    public List<Tiket> getAllTiket() throws SQLException {
+        return getAll();
+    }
+
     public Tiket getById(int id) throws SQLException {
         String sql = "SELECT * FROM tiket WHERE id = ?";
         Connection conn = DBConnection.getConnection();
