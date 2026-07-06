@@ -69,10 +69,10 @@ public class Main extends JFrame {
     }
 
     private void logout() {
-        // CATATAN: LoginPanel dari fitur/login-auth (Komang) belum ter-merge
-        // ke branch ini, jadi logout untuk sementara hanya menutup aplikasi
-        // dengan konfirmasi. Setelah LoginPanel & SessionManager sudah ada,
-        // ganti dispose() dengan: SessionManager.logout(); cardLayout.show(mainPanel, "login");
+        // CATATAN: LoginPanel dari fitur/login-auth (Komang) belum ter-merge.
+        // Logout sementara hanya menutup aplikasi dengan konfirmasi.
+        // Setelah LoginPanel & SessionManager sudah ada, ganti dispose() dengan:
+        // SessionManager.logout(); cardLayout.show(mainPanel, "login");
         int pilihan = JOptionPane.showConfirmDialog(
                 this,
                 "Yakin ingin logout dan keluar aplikasi?",
