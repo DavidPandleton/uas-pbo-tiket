@@ -1,6 +1,7 @@
 package com.uaspbo.dao;
 
 import com.uaspbo.model.Tiket;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,79 +11,121 @@ import java.util.List;
 
 public class TiketDAO {
 
-    public List<Tiket> getAll() throws SQLException {
-        List<Tiket> list = new ArrayList<>();
-        String sql = "SELECT * FROM tiket ORDER BY id";
-        Connection conn = DBConnection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Tiket t = new Tiket();
-            t.setId(rs.getInt("id"));
-            t.setNamaTiket(rs.getString("nama_tiket"));
-            t.setHarga(rs.getDouble("harga"));
-            t.setStokTiket(rs.getInt("stok_tiket"));
-            list.add(t);
-        }
-        rs.close();
-        ps.close();
-        return list;
-    }
-
-    // Alias sementara supaya kompatibel dengan TiketPanel.java
-    // (hapus method ini kalau Gusandra sudah menyamakan nama methodnya)
-    public List<Tiket> getAllTiket() throws SQLException {
-        return getAll();
-    }
-
-    public Tiket getById(int id) throws SQLException {
-        String sql = "SELECT * FROM tiket WHERE id = ?";
-        Connection conn = DBConnection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, id);
-        ResultSet rs = ps.executeQuery();
-        Tiket t = null;
-        if (rs.next()) {
-            t = new Tiket();
-            t.setId(rs.getInt("id"));
-            t.setNamaTiket(rs.getString("nama_tiket"));
-            t.setHarga(rs.getDouble("harga"));
-            t.setStokTiket(rs.getInt("stok_tiket"));
-        }
-        rs.close();
-        ps.close();
-        return t;
-    }
-
-    public void insert(Tiket tiket) throws SQLException {
+    // CREATE
+    public boolean tambahTiket(Tiket tiket) {
         String sql = "INSERT INTO tiket (nama_tiket, harga, stok_tiket) VALUES (?, ?, ?)";
-        Connection conn = DBConnection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, tiket.getNamaTiket());
-        ps.setDouble(2, tiket.getHarga());
-        ps.setInt(3, tiket.getStokTiket());
-        ps.executeUpdate();
-        ps.close();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tiket.getNamaTiket());
+            ps.setDouble(2, tiket.getHarga());
+            ps.setInt(3, tiket.getStokTiket());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Gagal menambah tiket: " + e.getMessage());
+            return false;
+        }
     }
 
-    public void update(Tiket tiket) throws SQLException {
-        String sql = "UPDATE tiket SET nama_tiket = ?, harga = ?, stok_tiket = ? WHERE id = ?";
-        Connection conn = DBConnection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, tiket.getNamaTiket());
-        ps.setDouble(2, tiket.getHarga());
-        ps.setInt(3, tiket.getStokTiket());
-        ps.setInt(4, tiket.getId());
-        ps.executeUpdate();
-        ps.close();
+    // READ (semua data)
+    public List<Tiket> getAllTiket() {
+        List<Tiket> daftarTiket = new ArrayList<>();
+        String sql = "SELECT * FROM tiket ORDER BY id ASC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Tiket tiket = new Tiket(
+                        rs.getInt("id"),
+                        rs.getString("nama_tiket"),
+                        rs.getDouble("harga"),
+                        rs.getInt("stok_tiket")
+                );
+                daftarTiket.add(tiket);
+            }
+        } catch (SQLException e) {
+            System.out.println("Gagal mengambil data tiket: " + e.getMessage());
+        }
+        return daftarTiket;
     }
 
-    public void delete(int id) throws SQLException {
+    // Alias supaya kompatibel dengan modul Transaksi yang memanggil getAll()
+    public List<Tiket> getAll() {
+        return getAllTiket();
+    }
+
+    // READ (berdasarkan id) — dipakai juga oleh modul Transaksi untuk cek stok
+    public Tiket getTiketById(int id) {
+        String sql = "SELECT * FROM tiket WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Tiket(
+                            rs.getInt("id"),
+                            rs.getString("nama_tiket"),
+                            rs.getDouble("harga"),
+                            rs.getInt("stok_tiket")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Gagal mengambil tiket: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // UPDATE
+    public boolean updateTiket(Tiket tiket) {
+        String sql = "UPDATE tiket SET nama_tiket=?, harga=?, stok_tiket=? WHERE id=?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tiket.getNamaTiket());
+            ps.setDouble(2, tiket.getHarga());
+            ps.setInt(3, tiket.getStokTiket());
+            ps.setInt(4, tiket.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Gagal mengupdate tiket: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // UPDATE khusus stok — dipakai modul Transaksi saat pembelian tiket
+    public boolean kurangiStok(int id, int jumlah) {
+        String sql = "UPDATE tiket SET stok_tiket = stok_tiket - ? WHERE id = ? AND stok_tiket >= ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, jumlah);
+            ps.setInt(2, id);
+            ps.setInt(3, jumlah);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Gagal mengurangi stok: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // DELETE
+    public boolean hapusTiket(int id) {
         String sql = "DELETE FROM tiket WHERE id = ?";
-        Connection conn = DBConnection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, id);
-        ps.executeUpdate();
-        ps.close();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Gagal menghapus tiket: " + e.getMessage());
+            return false;
+        }
     }
 }
