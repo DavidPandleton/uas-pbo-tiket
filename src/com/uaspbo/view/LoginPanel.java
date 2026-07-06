@@ -22,11 +22,16 @@ public class LoginPanel extends JPanel {
     private JPasswordField fieldPassword;
     private JButton btnLogin;
     private UserDAO userDAO;
+    private Runnable onLoginSuccess; 
 
     public LoginPanel() {
+        this(null);
+    }
+
+    public LoginPanel(Runnable onLoginSuccess) {
+        this.onLoginSuccess = onLoginSuccess;
         userDAO = new UserDAO();
         setLayout(new GridBagLayout());
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -61,6 +66,14 @@ public class LoginPanel extends JPanel {
         gbc.gridwidth = 2;
         add(btnLogin, gbc);
 
+        JLabel catatan = new JLabel("Untuk testing: admin / admin123", SwingConstants.CENTER);
+        catatan.setFont(new Font("SansSerif", Font.ITALIC, 11));
+        catatan.setForeground(java.awt.Color.GRAY);
+        gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        add(catatan, gbc);
+
         btnLogin.addActionListener(e -> prosesLogin());
     }
 
@@ -78,18 +91,19 @@ public class LoginPanel extends JPanel {
 
         try {
             User user = userDAO.login(username, password);
-
             if (user != null) {
-                SessionManager.setUser(user);
+                SessionManager.login(user.getUsername(), user.getUsername());
                 JOptionPane.showMessageDialog(this,
                         "Selamat datang, " + user.getUsername() + "!");
+                if (onLoginSuccess != null) {
+                    onLoginSuccess.run();
+                }
             } else {
                 JOptionPane.showMessageDialog(this,
                         "Username atau password salah",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
                     "Koneksi database error: " + e.getMessage(),

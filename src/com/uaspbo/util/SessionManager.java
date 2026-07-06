@@ -1,17 +1,5 @@
 package com.uaspbo.util;
 
-/**
- * SessionManager - menyimpan data user yang sedang login.
- *
- * CATATAN: File ini pada README merupakan bagian dari branch
- * fitur/login-auth (dikerjakan Komang). Versi di sini adalah
- * STUB minimal supaya Main.java & AboutPanel.java bisa dikompilasi
- * dan ditest secara mandiri di branch fitur/about-us.
- *
- * Saat merge ke main, pastikan method di bawah ini konsisten
- * (nama & signature) dengan implementasi asli dari Komang,
- * atau ganti isi file ini dengan punya Komang.
- */
 public class SessionManager {
 
     private static String namaUser;

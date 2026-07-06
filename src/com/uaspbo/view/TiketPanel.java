@@ -51,7 +51,7 @@ public class TiketPanel extends JPanel {
         tableModel = new DefaultTableModel(kolom, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; 
+                return false; // tabel hanya untuk tampilan, edit lewat form
             }
         };
         tabelTiket = new JTable(tableModel);
@@ -119,15 +119,27 @@ public class TiketPanel extends JPanel {
     }
 
     private void muatDataTiket() {
-        tableModel.setRowCount(0);
-        daftarTiketSaatIni = tiketDAO.getAllTiket();
-        for (Tiket t : daftarTiketSaatIni) {
-            tableModel.addRow(new Object[]{
-                    t.getId(),
-                    t.getNamaTiket(),
-                    formatRupiah.format(t.getHarga()),
-                    t.getStokTiket()
-            });
+        try {
+            tableModel.setRowCount(0);
+            daftarTiketSaatIni = tiketDAO.getAllTiket();
+            for (Tiket t : daftarTiketSaatIni) {
+                tableModel.addRow(new Object[]{
+                        t.getId(),
+                        t.getNamaTiket(),
+                        formatRupiah.format(t.getHarga()),
+                        t.getStokTiket()
+                });
+            }
+        } catch (Exception ex) {
+            daftarTiketSaatIni = new java.util.ArrayList<>();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Gagal memuat data tiket dari database.\n"
+                            + "Pastikan MySQL sudah aktif dan database sudah benar.\n\n"
+                            + "Detail: " + ex.getMessage(),
+                    "Kesalahan Koneksi Database",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -156,10 +168,12 @@ public class TiketPanel extends JPanel {
                 muatDataTiket();
                 bersihkanForm();
             } else {
-                JOptionPane.showMessageDialog(this, "Gagal menambahkan tiket.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Gagal menambahkan tiket. Cek koneksi database.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Harga dan stok harus berupa angka (contoh: 250000, tanpa Rp atau titik).", "Input Salah", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan tak terduga: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -182,10 +196,12 @@ public class TiketPanel extends JPanel {
                 muatDataTiket();
                 bersihkanForm();
             } else {
-                JOptionPane.showMessageDialog(this, "Gagal mengupdate tiket.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Gagal mengupdate tiket. Cek koneksi database.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Harga dan stok harus berupa angka (contoh: 250000, tanpa Rp atau titik).", "Input Salah", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan tak terduga: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -203,13 +219,17 @@ public class TiketPanel extends JPanel {
         );
 
         if (konfirmasi == JOptionPane.YES_OPTION) {
-            int id = Integer.parseInt(txtId.getText().trim());
-            if (tiketDAO.hapusTiket(id)) {
-                JOptionPane.showMessageDialog(this, "Tiket berhasil dihapus.");
-                muatDataTiket();
-                bersihkanForm();
-            } else {
-                JOptionPane.showMessageDialog(this, "Gagal menghapus tiket.", "Error", JOptionPane.ERROR_MESSAGE);
+            try {
+                int id = Integer.parseInt(txtId.getText().trim());
+                if (tiketDAO.hapusTiket(id)) {
+                    JOptionPane.showMessageDialog(this, "Tiket berhasil dihapus.");
+                    muatDataTiket();
+                    bersihkanForm();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Gagal menghapus tiket. Cek koneksi database.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Terjadi kesalahan tak terduga: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
