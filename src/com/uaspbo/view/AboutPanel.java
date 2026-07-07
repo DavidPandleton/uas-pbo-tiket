@@ -16,7 +16,7 @@ public class AboutPanel extends JPanel {
     // Data anggota kelompok: {NIM, Nama, nama file foto di folder resources/}
     private static final String[][] ANGGOTA = {
             {"250030085", "I Komang Gede Okantara", "komang.jpg"},
-            {"250030077", "Ida Bagus Mastyendra Suja", "mastyendra.jpg"},
+            {"250030077", "Ida Bagus Mastyendra Suja", "gusandra.jpg"},
             {"250030485", "I Dewa Agung Ayu Lidya Aristawati", "lidya.jpg"},
             {"250030487", "I Gusti Nyoman David Ray Tarigan", "david.jpg"}
     };
